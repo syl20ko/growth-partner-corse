@@ -691,6 +691,24 @@
 </head>
 <body>
 
+<!-- ===== PASSWORD GATE ===== -->
+<div id="gate" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg-dark);">
+    <div style="text-align:center;max-width:400px;padding:40px;">
+        <div style="font-size:48px;margin-bottom:24px;">🔒</div>
+        <h2 style="color:var(--gold);margin-bottom:8px;font-size:1.4rem;">Accès restreint</h2>
+        <p style="color:var(--text-muted);margin-bottom:24px;font-size:0.9rem;">Ce dashboard est confidentiel.<br>Entrez le mot de passe pour continuer.</p>
+        <input id="gate-pw" type="password" placeholder="Mot de passe"
+            style="width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);color:var(--text);font-size:1rem;margin-bottom:12px;outline:none;"
+            onkeydown="if(event.key==='Enter')document.getElementById('gate-btn').click()">
+        <button id="gate-btn" onclick="checkGate()"
+            style="width:100%;padding:12px;background:var(--gold);color:#111;border:none;border-radius:var(--radius);font-weight:600;font-size:1rem;cursor:pointer;">
+            Accéder
+        </button>
+        <p id="gate-error" style="color:var(--red-light);margin-top:12px;font-size:0.85rem;display:none;">Mot de passe incorrect</p>
+    </div>
+</div>
+
+<div id="content" style="display:none;">
 <!-- ===== NAVIGATION ===== -->
 <nav>
     <div class="nav-inner">
@@ -1349,6 +1367,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
     sections.forEach(section => observer.observe(section));
 });
+</script>
+
+</div><!-- /content -->
+
+<script>
+const HASH = 'dd5655c6cad88c258c64eea3964397b432cf2f0f582c08a9020dc57e411a77c7';
+async function sha256(msg) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function checkGate() {
+    const pw = document.getElementById('gate-pw').value;
+    if (await sha256(pw) === HASH) {
+        document.getElementById('gate').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+        sessionStorage.setItem('gpc-auth', '1');
+    } else {
+        document.getElementById('gate-error').style.display = 'block';
+        document.getElementById('gate-pw').value = '';
+    }
+}
+if (sessionStorage.getItem('gpc-auth') === '1') {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+}
+document.addEventListener('DOMContentLoaded', () => document.getElementById('gate-pw')?.focus());
 </script>
 
 </body>
