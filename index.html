@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growth Partner — Tableau de Bord</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-dark: #0f0f1a;
+            --bg-card: #1a1a2e;
+            --bg-card-alt: #16213e;
+            --border: #2a2a4a;
+            --red: #8B1A1A;
+            --red-light: #b22a2a;
+            --gold: #D4A843;
+            --gold-dim: #a88534;
+            --cream: #F5F0E8;
+            --cream-dim: #c4bfb4;
+            --text: #e8e8f0;
+            --text-muted: #9898b0;
+            --green: #2ecc71;
+            --green-dim: #1a8a4a;
+            --blue: #3498db;
+            --orange: #e67e22;
+            --purple: #9b59b6;
+            --radius: 12px;
+            --shadow: 0 4px 24px rgba(0,0,0,0.3);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== NAVIGATION ===== */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(15, 15, 26, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+        }
+        nav .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        nav .nav-inner::-webkit-scrollbar { display: none; }
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 14px 12px;
+            white-space: nowrap;
+            transition: color 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+        nav a:hover, nav a.active {
+            color: var(--gold);
+            border-bottom-color: var(--gold);
+        }
+
+        /* ===== LAYOUT ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        section {
+            padding: 64px 0 32px;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            text-align: center;
+            padding: 80px 24px 48px;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1028 50%, var(--bg-dark) 100%);
+            border-bottom: 1px solid var(--border);
+        }
+        header .badge {
+            display: inline-block;
+            background: rgba(139, 26, 26, 0.2);
+            color: var(--red-light);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(139, 26, 26, 0.3);
+            margin-bottom: 24px;
+        }
+        header h1 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            color: var(--cream);
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+        header h1 span { color: var(--gold); }
+        header p {
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+        header p strong {
+            color: var(--cream);
+        }
+
+        /* ===== SECTION TITLES ===== */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .section-title .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .section-title h2 {
+            font-size: clamp(22px, 3vw, 28px);
+            font-weight: 700;
+            color: var(--cream);
+            letter-spacing: -0.3px;
+        }
+        .section-title .subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* ===== CARDS GRID ===== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--gold-dim);
+        }
+        .card .label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--cream);
+            line-height: 1.2;
+        }
+        .card .value.gold { color: var(--gold); }
+        .card .value.green { color: var(--green); }
+        .card .value.red { color: var(--red-light); }
+        .card .detail {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+        .card .tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+        .tag-up {
+            background: rgba(46, 204, 113, 0.15);
+            color: var(--green);
+        }
+        .tag-warn {
+            background: rgba(230, 126, 34, 0.15);
+            color: var(--orange);
+        }
+        .tag-down {
+            background: rgba(139, 26, 26, 0.15);
+            color: var(--red-light);
+        }
+
+        /* ===== WIDE CARD ===== */
+        .card-wide {
+            grid-column: 1 / -1;
+        }
+
+        /* ===== CHANGES LIST ===== */
+        .changes-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .change-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .change-item .change-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            background: rgba(46, 204, 113, 0.12);
+        }
+        .change-item h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--cream);
+            margin-bottom: 4px;
+        }
+        .change-item p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* ===== PRIORITY TABLE ===== */
+        .priority-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .priority-table thead th {
+            background: var(--bg-card-alt);
+            padding: 14px 20px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+        .priority-table tbody td {
+            padding: 16px 20px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(42, 42, 74, 0.5);
+            vertical-align: top;
+        }
+        .priority-table tbody tr:last-child td { border-bottom: none; }
+        .priority-table tbody tr:hover { background: rgba(212, 168, 67, 0.04); }
+        .priority-table .rank {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--cream);
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border);
+        }
+        .priority-table .action-name {
+            font-weight: 600;
+            color: var(--cream);
+        }
+        .priority-table .action-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .impact-badge {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+        .impact-high {
+            background: rgba(46, 204, 113, 0.12);
+            color: var(--green);
+        }
+        .impact-medium {
+            background: rgba(52, 152, 219, 0.12);
+            color: var(--blue);
+        }
+        .cost-free {
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        /* ===== TIMELINE (Moteur mensuel) ===== */
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            position: relative;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 5%;
+            right: 5%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--red), var(--gold), var(--green), var(--blue));
+            border-radius: 2px;
+            z-index: 0;
+        }
+        .timeline-item {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            padding: 0 8px;
+        }
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin: 30px auto 16px;
+            border: 3px solid var(--bg-dark);
+            position: relative;
+        }
+        .timeline-item:nth-child(1) .timeline-dot { background: var(--red-light); }
+        .timeline-item:nth-child(2) .timeline-dot { background: var(--gold); }
+        .timeline-item:nth-child(3) .timeline-dot { background: var(--green); }
+        .timeline-item:nth-child(4) .timeline-dot { background: var(--blue); }
+        .timeline-week {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .timeline-label {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--cream);
+            margin-bottom: 8px;
+        }
+        .timeline-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .timeline-hours {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 12px;
+            margin-top: 10px;
+            background: rgba(212, 168, 67, 0.12);
+            color: var(--gold);
+        }
+        .timeline-total {
+            text-align: center;
+            margin-top: 32px;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+        .timeline-total .value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--gold);
+        }
+        .timeline-total .label {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ===== SEASONAL CALENDAR ===== */
+        .season-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+        .season-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .season-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--gold-dim);
+        }
+        .season-card .month {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .season-card .theme {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--cream);
+            margin-bottom: 8px;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .season-card .target {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .season-card.peak {
+            border-color: var(--gold-dim);
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(212, 168, 67, 0.08) 100%);
+        }
+        .season-card.peak .target { color: var(--gold); }
+        .season-card.high .target { color: var(--green); }
+        .season-card.low .target { color: var(--text-muted); }
+        .season-card.medium .target { color: var(--cream); }
+        .season-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+        .season-card.peak .season-bar { background: var(--gold); }
+        .season-card.high .season-bar { background: var(--green); }
+        .season-card.medium .season-bar { background: var(--blue); }
+        .season-card.low .season-bar { background: var(--border); }
+
+        /* ===== STACK TABLE ===== */
+        .stack-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .stack-table thead th {
+            background: var(--bg-card-alt);
+            padding: 12px 20px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+        .stack-table tbody td {
+            padding: 12px 20px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(42, 42, 74, 0.5);
+        }
+        .stack-table tbody tr:last-child td { border-bottom: none; }
+        .stack-table .free {
+            color: var(--green);
+            font-weight: 600;
+        }
+        .stack-table .paid {
+            color: var(--gold);
+            font-weight: 600;
+        }
+        .stack-total {
+            text-align: right;
+            padding: 16px 20px;
+            background: var(--bg-card-alt);
+            font-weight: 700;
+            color: var(--gold);
+            font-size: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ===== CHART SECTION ===== */
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+        }
+        .chart-wrapper {
+            position: relative;
+            max-height: 400px;
+        }
+
+        /* ===== CHECKLIST ===== */
+        .checklist {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 12px;
+        }
+        .check-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: border-color 0.2s;
+        }
+        .check-item:hover { border-color: var(--gold-dim); }
+        .check-box {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: transparent;
+        }
+        .check-item.priority .check-box {
+            border-color: var(--gold-dim);
+            background: rgba(212, 168, 67, 0.08);
+        }
+        .check-text {
+            font-size: 14px;
+            color: var(--cream);
+        }
+        .check-tag {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 8px;
+            margin-left: auto;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .check-tag.urgent {
+            background: rgba(139, 26, 26, 0.15);
+            color: var(--red-light);
+        }
+        .check-tag.quick {
+            background: rgba(46, 204, 113, 0.12);
+            color: var(--green);
+        }
+        .check-tag.new {
+            background: rgba(52, 152, 219, 0.12);
+            color: var(--blue);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 48px 24px;
+            border-top: 1px solid var(--border);
+            margin-top: 48px;
+        }
+        footer .name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--cream);
+            margin-bottom: 4px;
+        }
+        footer .role {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        footer .confidential {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.6;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            header { padding: 48px 16px 32px; }
+            section { padding: 48px 0 24px; }
+            .container { padding: 0 16px; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .timeline {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            .timeline::before { display: none; }
+            .timeline-dot { margin: 0 auto 12px; }
+            .season-grid { grid-template-columns: repeat(2, 1fr); }
+            .checklist { grid-template-columns: 1fr; }
+            .priority-table { font-size: 13px; }
+            .priority-table thead th,
+            .priority-table tbody td { padding: 12px; }
+            nav a { font-size: 12px; padding: 12px 8px; }
+        }
+        @media (max-width: 480px) {
+            .season-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .season-card { padding: 12px; }
+            .season-card .target { font-size: 16px; }
+        }
+
+        /* ===== TABLE RESPONSIVE ===== */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: var(--radius);
+        }
+
+        /* ===== PRINT ===== */
+        @media print {
+            body { background: #fff; color: #222; }
+            nav { display: none; }
+            header { background: #fff; border-bottom: 2px solid #222; padding: 24px 0; }
+            header h1 { color: #222; }
+            header h1 span { color: #8B1A1A; }
+            header .badge { border-color: #8B1A1A; color: #8B1A1A; }
+            header p { color: #555; }
+            .card, .change-item, .check-item, .chart-container, .timeline-total, .season-card {
+                background: #fff;
+                border: 1px solid #ddd;
+                box-shadow: none;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .card .value { color: #222; }
+            .card .label, .card .detail { color: #555; }
+            .section-title h2 { color: #222; }
+            .priority-table { border: 1px solid #ddd; }
+            .priority-table thead th { background: #f5f5f5; color: #555; }
+            .priority-table tbody td { color: #222; }
+            .stack-table { border: 1px solid #ddd; }
+            .stack-table thead th { background: #f5f5f5; color: #555; }
+            footer { border-top: 1px solid #ddd; }
+            section { page-break-inside: avoid; padding: 32px 0 16px; }
+            .cards-grid, .changes-list, .checklist { gap: 8px; }
+        }
+
+        /* ===== SCROLL OFFSET ===== */
+        section[id] {
+            scroll-margin-top: 60px;
+        }
+
+        /* ===== DIVIDER ===== */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 16px 0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav>
+    <div class="nav-inner">
+        <a href="#situation">Situation</a>
+        <a href="#changements">Changements</a>
+        <a href="#priorites">20/80</a>
+        <a href="#moteur">Moteur</a>
+        <a href="#calendrier">Calendrier</a>
+        <a href="#stack">Stack</a>
+        <a href="#concurrence">Concurrence</a>
+        <a href="#etapes">Prochaines Etapes</a>
+    </div>
+</nav>
+
+<!-- ===== HEADER ===== -->
+<header>
+    <div class="badge">Confidentiel</div>
+    <h1>Tableau de Bord — <span>Growth Partner</span></h1>
+    <p>Plan d'actions operationnel — Mise a jour : <strong>29 avril 2026</strong></p>
+</header>
+
+<!-- ===== SECTION 1: SITUATION ACTUELLE ===== -->
+<section id="situation">
+    <div class="container">
+        <div class="section-title">
+            <div class="icon" style="background:rgba(139,26,26,0.12);">
+                <span>&#x1F4CA;</span>
+            </div>
+            <div>
+                <h2>Situation Actuelle</h2>
+                <div class="subtitle">Vue d'ensemble des metriques cles</div>
+            </div>
+        </div>
+
+        <div class="cards-grid">
+            <!-- CA 2025 -->
+            <div class="card">
+                <div class="label">CA 2025</div>
+                <div class="value">25 204 &euro;</div>
+                <div class="detail">358 commandes &middot; Panier moyen 70 &euro;</div>
+            </div>
+
+            <!-- Projection 2026 -->
+            <div class="card">
+                <div class="label">Projection 2026</div>
+                <div class="value gold">75-85k &euro;</div>
+                <div class="detail">+254% sur Q1 2025</div>
+                <span class="tag tag-up">&#x2191; Forte croissance</span>
+            </div>
+
+            <!-- Score digital -->
+            <div class="card">
+                <div class="label">Score Digital</div>
+                <div class="value">2.7<span style="font-size:18px;color:var(--text-muted);">/5</span></div>
+                <div class="detail">Produit 5/5 &middot; Execution digitale 2/5</div>
+                <span class="tag tag-warn">Marge de progression</span>
+            </div>
+
+            <!-- Instagram -->
+            <div class="card">
+                <div class="label">Instagram</div>
+                <div class="value">461</div>
+                <div class="detail">abonnes &middot; vs 23 000 Marcatu Corsu (leader)</div>
+                <span class="tag tag-down">A developper</span>
+            </div>
+
+            <!-- Facebook -->
+            <div class="card">
+                <div class="label">Facebook</div>
+                <div class="value">69 <span style="font-size:16px;color:var(--text-muted);">likes</span></div>
+                <div class="detail">Mais Recettes Corses = 16 600 likes</div>
+                <span class="tag tag-up">Levier cross-promo</span>
+            </div>
+
+            <!-- Avis Google -->
+            <div class="card">
+                <div class="label">Avis Google</div>
+                <div class="value red">14</div>
+                <div class="detail">vs 793 Ethicorse &middot; vs 82 Marcatu Corsu</div>
+                <span class="tag tag-down">Priorite basse</span>
+            </div>
+
+            <!-- SEO -->
+            <div class="card card-wide">
+                <div class="label">Positions SEO</div>
+                <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;">
+                    <div style="background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.2);border-radius:8px;padding:8px 16px;">
+                        <span style="color:var(--green);font-weight:700;">#1</span>
+                        <span style="color:var(--text-muted);font-size:13px;margin-left:6px;">panier garni corse</span>
+                    </div>
+                    <div style="background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.2);border-radius:8px;padding:8px 16px;">
+                        <span style="color:var(--green);font-weight:700;">#1</span>
+                        <span style="color:var(--text-muted);font-size:13px;margin-left:6px;">plateau apero corse</span>
+                    </div>
+                    <div style="background:rgba(139,26,26,0.1);border:1px solid rgba(139,26,26,0.2);border-radius:8px;padding:8px 16px;">
+                        <span style="color:var(--red-light);font-weight:700;">ABSENT</span>
+                        <span style="color:var(--text-muted);font-size:13px;margin-left:6px;">coffret cadeau corse</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 2: CHANGEMENTS MAI 2026 ===== -->
+<section id="changements">
+    <div class="container">
+        <div class="section-title">
+            <div class="icon" style="background:rgba(46,204,113,0.12);">
+                <span>&#x1F680;</span>
+            </div>
+            <div>
+                <h2>Changements Mai 2026</h2>
+                <div class="subtitle">Nouveautes qui changent la donne</div>
+            </div>
+        </div>
+
+        <div class="changes-list">
+            <div class="change-item">
+                <div class="change-icon">&#x1F4E6;</div>
+                <div>
+                    <h4>Nouveau systeme livraison</h4>
+                    <p>Chronopost + Shop2Shop — couverture nationale fiable</p>
+                </div>
+            </div>
+            <div class="change-item">
+                <div class="change-icon">&#x1F381;</div>
+                <div>
+                    <h4>Livraison gratuite des 100 &euro;</h4>
+                    <p>Seuil baisse de 250 &euro; a 100 &euro; — debloque le panier moyen</p>
+                </div>
+            </div>
+            <div class="change-item">
+                <div class="change-icon">&#x26A1;</div>
+                <div>
+                    <h4>Livraison 24h Chronopost</h4>
+                    <p>Avantage concurrentiel fort sur le frais et la confiance</p>
+                </div>
+            </div>
+            <div class="change-item">
+                <div class="change-icon">&#x1F3AF;</div>
+                <div>
+                    <h4>Arret traiteur, focus 100% digital</h4>
+                    <p>Toute l'energie concentree sur le e-commerce</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 3: LE 20/80 ===== -->
+<section id="priorites">
+    <div class="container">
+        <div class="section-title">
+            <div class="icon" style="background:rgba(212,168,67,0.12);">
+                <span>&#x1F3AF;</span>
+            </div>
+            <div>
+                <h2>Le 20/80 — Actions Prioritaires</h2>
+                <div class="subtitle">Maximum de resultats, minimum d'effort</div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="priority-table">
+                <thead>
+                    <tr>
+                        <th style="width:50px;">#</th>
+                        <th>Action</th>
+                        <th>Impact</th>
+                        <th>Cout</th>
+                        <th>Setup</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><div class="rank">1</div></td>
+                        <td>
+                            <div class="action-name">Email automation</div>
+                            <div class="action-desc">Paniers abandonnes + sequence post-achat</div>
+                        </td>
+                        <td><span class="impact-badge impact-high">+15-25% CA</span></td>
+                        <td><span class="cost-free">0 &euro;</span><br><span style="font-size:12px;color:var(--text-muted);">Brevo free</span></td>
+                        <td>10h</td>
+                    </tr>
+                    <tr>
+                        <td><div class="rank">2</div></td>
+                        <td>
+                            <div class="action-name">Google Shopping</div>
+                            <div class="action-desc">Listings gratuits + payant via Merchant Center</div>
+                        </td>
+                        <td><span class="impact-badge impact-high">+10-20% trafic produit</span></td>
+                        <td><span class="cost-free">0 &euro;</span></td>
+                        <td>5h</td>
+                    </tr>
+                    <tr>
+                        <td><div class="rank">3</div></td>
+                        <td>
+                            <div class="action-name">SEO quick wins</div>
+                            <div class="action-desc">Titles, metas, pages fantomes, landing pages</div>
+                        </td>
+                        <td><span class="impact-badge impact-high">+15-30% CTR organique</span></td>
+                        <td><span class="cost-free">0 &euro;</span></td>
+                        <td>5h</td>
+                    </tr>
+                    <tr>
+                        <td><div class="rank">4</div></td>
+                        <td>
+                            <div class="action-name">Optimisation Google Ads mensuelle</div>
+                            <div class="action-desc">Ajustements encheres, negatifs, audiences</div>
+                        </td>
+                        <td><span class="impact-badge impact-high">ROAS 3-6x</span></td>
+                        <td><span class="cost-free">0 &euro;</span></td>
+                        <td>Existant</td>
+                    </tr>
+                    <tr>
+                        <td><div class="rank">5</div></td>
+                        <td>
+                            <div class="action-name">Cross-promo Recettes Corses</div>
+                            <div class="action-desc">16 600 fans Facebook = trafic gratuit</div>
+                        </td>
+                        <td><span class="impact-badge impact-medium">Trafic gratuit</span></td>
+                        <td><span class="cost-free">0 &euro;</span></td>
+                        <td>1h</td>
+                    </tr>
+                    <tr>
+                        <td><div class="rank">6</div></td>
+                        <td>
+                            <div class="action-name">Contenu social</div>
+                            <div class="action-desc">12 posts/mois IG + cross-post FB + Pinterest</div>
+                        </td>
+                        <td><span class="impact-badge impact-medium">Brand + retargeting</span></td>
+                        <td><span class="cost-free">0 &euro;</span></td>
+                        <td>2h</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 4: MOTEUR MENSUEL ===== -->
+<section id="moteur">
+    <div class="container">
+        <div class="section-title">
+            <div class="icon" style="background:rgba(52,152,219,0.12);">
+                <span>&#x2699;&#xFE0F;</span>
+            </div>
+            <div>
+                <h2>Moteur Mensuel</h2>
+                <div class="subtitle">Cadence de travail recurrente — 4 semaines</div>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-week">Semaine 1</div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-label">Mesurer</div>
+                <div class="timeline-desc">GA4 + Ads + GSC<br>Analyse des KPIs</div>
+                <span class="timeline-hours">1h</span>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-week">Semaine 2</div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-label">Optimiser</div>
+                <div class="timeline-desc">Ads + email check<br>Ajustements rapides</div>
+                <span class="timeline-hours">2h</span>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-week">Semaine 3</div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-label">Preparer</div>
+                <div class="timeline-desc">Campagne M+1<br>Contenu social</div>
+                <span class="timeline-hours">2.5h</span>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-week">Semaine 4</div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-label">Rapporter</div>
+                <div class="timeline-desc">Dashboard + point Fred<br>Bilan du mois</div>
+                <span class="timeline-hours">1.5h</span>
+            </div>
+        </div>
+
+        <div class="timeline-total">
+            <div class="value">~9h<span style="font-size:18px;color:var(--text-muted);">/mois</span></div>
+            <div class="label">Volume horaire mensuel total</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 5: CALENDRIER SAISONNIER ===== -->
+<section id="calendrier">
+    <div class="container">
+        <div class="section-title">
+            <div class="icon" style="background:rgba(155,89,182,0.12);">
+                <span>&#x1F4C5;</span>
+            </div>
+            <div>
+                <h2>Calendrier Saisonnier</h2>
+                <div class="subtitle">Temps forts et objectifs CA mensuels</div>
+            </div>
+        </div>
+
+        <div class="season-grid">
+            <div class="season-card medium">
+                <div class="month">Janvier</div>
+                <div class="theme">Figatelli frais</div>
+                <div class="target">1 000 &euro;</div>
+                <div class="season-bar"></div>
+            </div>
+            <div class="season-card high">
+                <div class="month">Fevrier</div>
+                <div class="theme">Saint-Valentin + figatelli pic</div>
+                <div class="target">1 700 &euro;</div>
+                <div class="season-bar"></div>
+            </div>
+            <div class="season-card medium">
+                <div class="month">Mars</div>
+                <div class="theme">Derniers figatelli + Paques</div>
+                <div class="target">1 350 &euro;</div>
+                <div class="season-bar"></div>
+            </div>
+            <div class="season-card low">
+                <div class="month">Avril</div>
+                <div class="theme">Paques + recrutement email</div>
+                <div class="target">950 &euro;</div>
+                <div class="season-bar"></div>
+            </div>
+            <div class="season-card medium">
+                <div class="month">Mai</div>
+                <div class="theme">Fete des Meres</div>
+                <div class="target">1 000 &euro;</div>
+                <div class="season-bar"></div>
+            </div>
+            <div class="season-card medium">
+                <div class="month">Juin</div>
+                <div class="theme">Fete des Peres + B2B/CSE launch</div>
+                <div class="target">1 100 &euro;</div>
+                <div class="season-bar"></div>
+            </div>
+            <div class="season-card medium">
+                <div class="month">Juillet</div>
+                <div class="theme">Grillades / apero</div>
+                <div class="target">1 100 &euro;</div>
+                <div class="season-bar"></div>
+            </div>
+            <div class="season-card high">
+                <div class="month">Aout</div>
+                <div class="theme">Touristes retour Corse</div>
+                <div class="target">1 600 &euro;</div>
+                <div class="season-bar"></div>
+            </div>
+            <div class="season-card medium">
+                <div class="month">Septembre</div>
+                <div class="theme">CHARNIERE — prospection CSE + teasing figatelli</div>
+                <div class="target">1 200 &euro;</div>
+                <div class="season-bar"></div>
+            </div>
+            <div class="season-card high">
+                <div class="month">Octobre</div>
+                <div class="theme">Precommandes figatelli + catalogue Noel</div>
+                <div class="target">2 000 &euro;</div>
+                <div class="season-bar"></div>
+            </div>
+            <div class="season-card high">
+                <div class="month">Novembre</div>
+                <div class="theme">Black Friday + CSE final</div>
+                <div class="target">2 000 &euro;</div>
+                <div class="season-bar"></div>
+            </div>
+            <div class="season-card peak">
+                <div class="month">Decembre</div>
+                <div class="theme">PIC ABSOLU</div>
+                <div class="target">8 000 &euro;</div>
+                <div class="season-bar"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 6: COUT DE LA STACK ===== -->
+<section id="stack">
+    <div class="container">
+        <div class="section-title">
+            <div class="icon" style="background:rgba(46,204,113,0.12);">
+                <span>&#x1F4B0;</span>
+            </div>
+            <div>
+                <h2>Cout de la Stack</h2>
+                <div class="subtitle">Outils 100% gratuits ou quasi-gratuits</div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="stack-table">
+                <thead>
+                    <tr>
+                        <th>Outil</th>
+                        <th>Usage</th>
+                        <th style="text-align:right;">Cout/mois</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="color:var(--cream);font-weight:500;">Brevo</td>
+                        <td>Email automation (paniers abandonnes, post-achat)</td>
+                        <td style="text-align:right;" class="free">0 &euro;</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--cream);font-weight:500;">Google Shopping</td>
+                        <td>Listings produits gratuits + Merchant Center</td>
+                        <td style="text-align:right;" class="free">0 &euro;</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--cream);font-weight:500;">Search Console</td>
+                        <td>Suivi SEO, couverture index, performances</td>
+                        <td style="text-align:right;" class="free">0 &euro;</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--cream);font-weight:500;">Google Analytics 4</td>
+                        <td>Analytics complet, e-commerce, audiences</td>
+                        <td style="text-align:right;" class="free">0 &euro;</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--cream);font-weight:500;">Meta Business Suite</td>
+                        <td>Gestion Instagram + Facebook</td>
+                        <td style="text-align:right;" class="free">0 &euro;</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--cream);font-weight:500;">Pinterest Business</td>
+                        <td>Epingles produits, trafic supplementaire</td>
+                        <td style="text-align:right;" class="free">0 &euro;</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--cream);font-weight:500;">GitHub Pages</td>
+                        <td>Hebergement du dashboard</td>
+                        <td style="text-align:right;" class="free">0 &euro;</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--cream);font-weight:500;">Rank Math</td>
+                        <td>Plugin SEO WordPress</td>
+                        <td style="text-align:right;" class="free">0 &euro;</td>
+                    </tr>
+                    <tr>
+                        <td style="color:var(--cream);font-weight:500;">Claude API</td>
+                        <td>Generation contenu, analyse, automatisation</td>
+                        <td style="text-align:right;" class="paid">~5 &euro;</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" class="stack-total" style="text-align:left;">TOTAL MENSUEL</td>
+                        <td class="stack-total">3-5 &euro;/mois</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 7: CONCURRENCE INSTAGRAM ===== -->
+<section id="concurrence">
+    <div class="container">
+        <div class="section-title">
+            <div class="icon" style="background:rgba(155,89,182,0.12);">
+                <span>&#x1F4F1;</span>
+            </div>
+            <div>
+                <h2>Concurrence Instagram</h2>
+                <div class="subtitle">Benchmark des abonnes Instagram — epicerie fine corse</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-wrapper">
+                <canvas id="instagramChart"></canvas>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SECTION 8: PROCHAINES ETAPES ===== -->
+<section id="etapes">
+    <div class="container">
+        <div class="section-title">
+            <div class="icon" style="background:rgba(212,168,67,0.12);">
+                <span>&#x2705;</span>
+            </div>
+            <div>
+                <h2>Prochaines Etapes</h2>
+                <div class="subtitle">Checklist des actions a lancer</div>
+            </div>
+        </div>
+
+        <div class="checklist">
+            <div class="check-item priority">
+                <div class="check-box"></div>
+                <span class="check-text">Configurer Brevo (email automation paniers abandonnes)</span>
+                <span class="check-tag urgent">Priorite</span>
+            </div>
+            <div class="check-item priority">
+                <div class="check-box"></div>
+                <span class="check-text">Configurer Google Shopping (Merchant Center + plugin)</span>
+                <span class="check-tag urgent">Priorite</span>
+            </div>
+            <div class="check-item priority">
+                <div class="check-box"></div>
+                <span class="check-text">Quick wins SEO (title accueil, pages fantomes, metas)</span>
+                <span class="check-tag quick">Quick win</span>
+            </div>
+            <div class="check-item">
+                <div class="check-box"></div>
+                <span class="check-text">Connecter Search Console</span>
+                <span class="check-tag quick">Quick win</span>
+            </div>
+            <div class="check-item">
+                <div class="check-box"></div>
+                <span class="check-text">Lancer cross-promo Recettes Corses &rarr; Tiramiland</span>
+                <span class="check-tag quick">Quick win</span>
+            </div>
+            <div class="check-item">
+                <div class="check-box"></div>
+                <span class="check-text">Creer landing page /coffret-cadeau-corse/</span>
+                <span class="check-tag new">SEO</span>
+            </div>
+            <div class="check-item">
+                <div class="check-box"></div>
+                <span class="check-text">Creer page /entreprises (B2B/CSE)</span>
+                <span class="check-tag new">Nouveau</span>
+            </div>
+            <div class="check-item">
+                <div class="check-box"></div>
+                <span class="check-text">Evaluer TikTok Shop (demande Fred 28/04)</span>
+                <span class="check-tag new">A evaluer</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    <div class="name">Sylvain Caron</div>
+    <div class="role">Developpement Web et Marketing Analytique</div>
+    <div class="confidential">Ce dashboard est mis a jour mensuellement &middot; Donnees confidentielles</div>
+</footer>
+
+<!-- ===== CHART.JS INIT ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('instagramChart').getContext('2d');
+
+    const data = {
+        labels: [
+            'Marcatu Corsu',
+            'A Fiera',
+            'Ethicorse',
+            'Corsica Colis',
+            'Panier Corse',
+            'Tiramiland',
+            'Rose Campo'
+        ],
+        datasets: [{
+            label: 'Abonnes Instagram',
+            data: [23000, 3199, 2764, 859, 749, 461, 146],
+            backgroundColor: [
+                'rgba(155, 89, 182, 0.7)',
+                'rgba(52, 152, 219, 0.7)',
+                'rgba(52, 152, 219, 0.6)',
+                'rgba(52, 152, 219, 0.5)',
+                'rgba(52, 152, 219, 0.4)',
+                'rgba(212, 168, 67, 0.8)',
+                'rgba(52, 152, 219, 0.3)'
+            ],
+            borderColor: [
+                'rgba(155, 89, 182, 1)',
+                'rgba(52, 152, 219, 1)',
+                'rgba(52, 152, 219, 0.9)',
+                'rgba(52, 152, 219, 0.8)',
+                'rgba(52, 152, 219, 0.7)',
+                'rgba(212, 168, 67, 1)',
+                'rgba(52, 152, 219, 0.5)'
+            ],
+            borderWidth: 1,
+            borderRadius: 6
+        }]
+    };
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: data,
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1a1a2e',
+                    titleColor: '#F5F0E8',
+                    bodyColor: '#e8e8f0',
+                    borderColor: '#2a2a4a',
+                    borderWidth: 1,
+                    padding: 12,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.x.toLocaleString('fr-FR') + ' abonnes';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(42, 42, 74, 0.4)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#9898b0',
+                        font: { size: 12 },
+                        callback: function(value) {
+                            if (value >= 1000) return (value / 1000) + 'k';
+                            return value;
+                        }
+                    }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: {
+                        color: '#e8e8f0',
+                        font: { size: 13, weight: '500' },
+                        padding: 8
+                    }
+                }
+            }
+        }
+    });
+
+    // Nav active state on scroll
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('nav a');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active',
+                        link.getAttribute('href') === '#' + entry.target.id
+                    );
+                });
+            }
+        });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+
+    sections.forEach(section => observer.observe(section));
+});
+</script>
+
+</body>
+</html>
