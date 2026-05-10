@@ -336,8 +336,10 @@
 </div><!-- /content -->
 
 <script>
-function checkGate(){var e=document.getElementById("gate-pw").value;if(btoa(e)==="Y29yc2U="){document.getElementById("gate").style.display="none";document.getElementById("content").style.display="block";sessionStorage.setItem("gp_auth","1")}else{document.getElementById("gate-error").style.display="block"}}
-if(sessionStorage.getItem("gp_auth")==="1"){document.getElementById("gate").style.display="none";document.getElementById("content").style.display="block"}
+const HASH='dd5655c6cad88c258c64eea3964397b432cf2f0f582c08a9020dc57e411a77c7';
+async function sha256(m){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(m));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function checkGate(){if(await sha256(document.getElementById('gate-pw').value)===HASH){document.getElementById('gate').style.display='none';document.getElementById('content').style.display='block';sessionStorage.setItem('gpc','1')}else{document.getElementById('gate-error').style.display='block';document.getElementById('gate-pw').value=''}}
+if(sessionStorage.getItem('gpc')==='1'){document.getElementById('gate').style.display='none';document.getElementById('content').style.display='block'}
 </script>
 
 </body>
