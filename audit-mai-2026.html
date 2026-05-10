@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Mai 2026 — tiramiland.com</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0f0f1a; --card: #1a1a2e; --card2: #16213e; --border: #2a2a4a;
+            --red: #8B1A1A; --red-l: #b22a2a; --gold: #D4A843; --gold-d: #a88534;
+            --cream: #F5F0E8; --cream-d: #c4bfb4; --text: #e8e8f0; --muted: #9898b0;
+            --green: #2ecc71; --blue: #3498db; --orange: #e67e22; --purple: #9b59b6;
+            --r: 12px; --shadow: 0 4px 24px rgba(0,0,0,0.3);
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        nav { position: sticky; top: 0; z-index: 100; background: rgba(15,15,26,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+        .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 4px; padding: 10px 20px; overflow-x: auto; flex-wrap: nowrap; }
+        .nav-inner a { color: var(--muted); text-decoration: none; padding: 6px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 500; white-space: nowrap; transition: all 0.2s; }
+        .nav-inner a:hover, .nav-inner a.active { color: var(--gold); background: rgba(212,168,67,0.1); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px 60px; }
+        h1 { font-size: 2rem; color: var(--cream); margin-bottom: 4px; }
+        .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 32px; }
+        h2 { font-size: 1.35rem; color: var(--gold); margin: 48px 0 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+        h3 { font-size: 1.05rem; color: var(--cream); margin: 24px 0 12px; }
+        .source { display: inline-block; font-size: 0.7rem; color: var(--muted); background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 16px 0; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 20px; box-shadow: var(--shadow); }
+        .card-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .card-value { font-size: 1.6rem; font-weight: 700; color: var(--cream); }
+        .card-detail { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+        .card-value.gold { color: var(--gold); }
+        .card-value.red { color: var(--red-l); }
+        .card-value.green { color: var(--green); }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.88rem; }
+        th { text-align: left; padding: 10px 12px; color: var(--gold); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); }
+        td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .highlight { background: rgba(212,168,67,0.08); }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+        .badge-green { background: rgba(46,204,113,0.15); color: var(--green); }
+        .badge-red { background: rgba(178,42,42,0.15); color: var(--red-l); }
+        .badge-gold { background: rgba(212,168,67,0.15); color: var(--gold); }
+        .badge-blue { background: rgba(52,152,219,0.15); color: var(--blue); }
+        .badge-orange { background: rgba(230,126,34,0.15); color: var(--orange); }
+        .back-link { display: inline-block; margin-bottom: 20px; color: var(--gold); text-decoration: none; font-size: 0.88rem; }
+        .back-link:hover { text-decoration: underline; }
+        .score-bar { display: flex; align-items: center; gap: 12px; margin: 8px 0; }
+        .score-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+        .score-fill { height: 100%; border-radius: 4px; }
+        .score-label { font-size: 0.82rem; color: var(--muted); min-width: 160px; }
+        .score-value { font-size: 0.82rem; font-weight: 600; min-width: 50px; text-align: right; }
+        .effort { display: inline-block; font-size: 0.72rem; padding: 1px 6px; border-radius: 4px; margin-left: 6px; }
+        .effort-5 { background: rgba(46,204,113,0.15); color: var(--green); }
+        .effort-30 { background: rgba(52,152,219,0.15); color: var(--blue); }
+        .effort-2h { background: rgba(230,126,34,0.15); color: var(--orange); }
+        .effort-day { background: rgba(178,42,42,0.15); color: var(--red-l); }
+        footer { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 60px; }
+        @media (max-width: 768px) { .cards { grid-template-columns: 1fr 1fr; } h1 { font-size: 1.5rem; } }
+        @media (max-width: 480px) { .cards { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<!-- ===== PASSWORD GATE ===== -->
+<div id="gate" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);">
+    <div style="text-align:center;max-width:400px;padding:40px;">
+        <div style="font-size:48px;margin-bottom:24px;">&#x1f50d;</div>
+        <h2 style="color:var(--gold);margin-bottom:8px;font-size:1.4rem;border:none;">Audit Mai 2026</h2>
+        <p style="color:var(--muted);margin-bottom:24px;font-size:0.9rem;">Resultats d'audit confidentiel.<br>Entrez le mot de passe pour continuer.</p>
+        <input id="gate-pw" type="password" placeholder="Mot de passe"
+            style="width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:var(--r);background:var(--card);color:var(--text);font-size:1rem;margin-bottom:12px;outline:none;"
+            onkeydown="if(event.key==='Enter')document.getElementById('gate-btn').click()">
+        <button id="gate-btn" onclick="checkGate()"
+            style="width:100%;padding:12px;background:var(--gold);color:#111;border:none;border-radius:var(--r);font-weight:600;font-size:1rem;cursor:pointer;">Acceder</button>
+        <p id="gate-error" style="color:var(--red-l);margin-top:12px;font-size:0.85rem;display:none;">Mot de passe incorrect</p>
+    </div>
+</div>
+
+<div id="content" style="display:none;">
+
+<nav>
+    <div class="nav-inner">
+        <a href="index.html">&larr; Dashboard</a>
+        <a href="#scores">Scores</a>
+        <a href="#quickwins">Quick wins</a>
+        <a href="#seo">SEO</a>
+        <a href="#ads">Google Ads</a>
+        <a href="#search">Search Console</a>
+        <a href="#contenu">Contenu</a>
+        <a href="#structure">Structure</a>
+    </div>
+</nav>
+
+<div class="container">
+
+<a href="index.html" class="back-link">&larr; Retour au tableau de bord</a>
+<h1>Audit Mai 2026 &mdash; tiramiland.com</h1>
+<p class="subtitle">SEO + Google Ads + Search Console &mdash; 10 mai 2026</p>
+
+<!-- ===== SCORES ===== -->
+<h2 id="scores">Scores globaux</h2>
+
+<div class="cards">
+    <div class="card">
+        <div class="card-label">Score SEO global</div>
+        <div class="card-value red">41 / 100</div>
+        <div class="card-detail">Produit excellent, execution digitale a ameliorer</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Score IA / GEO</div>
+        <div class="card-value gold">54 / 100</div>
+        <div class="card-detail">Visible par les IA, pas encore citable</div>
+    </div>
+    <div class="card">
+        <div class="card-label">ROAS Google Ads</div>
+        <div class="card-value red">~1,3x</div>
+        <div class="card-detail">173&euro; depenses &rarr; ~220&euro; CA (14 jours)</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Trafic organique</div>
+        <div class="card-value green">120 / jour</div>
+        <div class="card-detail">10 679 clics / 3 mois &middot; 80% blog, 20% produits</div>
+    </div>
+</div>
+
+<div style="margin-top:20px;">
+    <div class="score-bar"><span class="score-label">Technical SEO</span><div class="score-track"><div class="score-fill" style="width:51%;background:var(--orange);"></div></div><span class="score-value" style="color:var(--orange);">51%</span></div>
+    <div class="score-bar"><span class="score-label">Contenu &amp; E-E-A-T</span><div class="score-track"><div class="score-fill" style="width:45%;background:var(--orange);"></div></div><span class="score-value" style="color:var(--orange);">45%</span></div>
+    <div class="score-bar"><span class="score-label">On-Page SEO</span><div class="score-track"><div class="score-fill" style="width:30%;background:var(--red-l);"></div></div><span class="score-value" style="color:var(--red-l);">30%</span></div>
+    <div class="score-bar"><span class="score-label">Schema / Donnees structurees</span><div class="score-track"><div class="score-fill" style="width:25%;background:var(--red-l);"></div></div><span class="score-value" style="color:var(--red-l);">25%</span></div>
+    <div class="score-bar"><span class="score-label">Performance (CWV)</span><div class="score-track"><div class="score-fill" style="width:50%;background:var(--orange);"></div></div><span class="score-value" style="color:var(--orange);">50%</span></div>
+    <div class="score-bar"><span class="score-label">Visibilite IA (GEO)</span><div class="score-track"><div class="score-fill" style="width:54%;background:var(--orange);"></div></div><span class="score-value" style="color:var(--orange);">54%</span></div>
+    <div class="score-bar"><span class="score-label">Backlinks</span><div class="score-track"><div class="score-fill" style="width:15%;background:var(--red-l);"></div></div><span class="score-value" style="color:var(--red-l);">15%</span></div>
+</div>
+
+<!-- ===== QUICK WINS ===== -->
+<h2 id="quickwins">Quick wins &mdash; 5 minutes chacun, impact immediat</h2>
+
+<table>
+    <thead><tr><th>#</th><th>Action</th><th>Effort</th><th>Effet attendu sur les ventes</th></tr></thead>
+    <tbody>
+        <tr class="highlight"><td>1</td><td><strong>Title homepage</strong> &rarr; &laquo;Epicerie Corse en Ligne | Produits du Terroir &mdash; Tiramiland&raquo;</td><td><span class="effort effort-5">5 min</span></td><td>Position homepage de 10,3 vers top 5 &middot; +195 clics/trim</td></tr>
+        <tr class="highlight"><td>2</td><td><strong>Meta description homepage</strong> &rarr; description commerciale (actuellement une date cassee)</td><td><span class="effort effort-5">5 min</span></td><td>CTR homepage x2 dans les resultats Google</td></tr>
+        <tr class="highlight"><td>3</td><td><strong>Tracking GA4</strong> &mdash; activer le nettoyage des evenements e-commerce (gtm4wp)</td><td><span class="effort effort-5">5 min</span></td><td>Donnees fiables = optimisation Ads et SEO possible</td></tr>
+        <tr><td>4</td><td><strong>Sitemap dans robots.txt</strong></td><td><span class="effort effort-5">5 min</span></td><td>Google decouvre mieux les pages produit</td></tr>
+        <tr><td>5</td><td><strong>Desactiver SiteWit Analytics</strong> (script inutile)</td><td><span class="effort effort-5">5 min</span></td><td>Pages plus rapides</td></tr>
+        <tr><td>6</td><td><strong>Indexation instantanee Bing</strong> (IndexNow dans Rank Math)</td><td><span class="effort effort-5">5 min</span></td><td>Modifications indexees en minutes sur Bing</td></tr>
+    </tbody>
+</table>
+
+<!-- ===== SEO ===== -->
+<h2 id="seo">SEO &mdash; Titles, metas et pages a corriger</h2>
+
+<h3>Pages avec beaucoup de visibilite mais peu de clics <span class="source">Google Search Console &mdash; 3 mois</span></h3>
+<p style="font-size:0.82rem;color:var(--muted);margin-bottom:12px;">Ces pages apparaissent deja dans Google mais leur titre ou description ne donne pas assez envie de cliquer. Les corriger ne demande que 15 min par page dans Rank Math et peut generer <strong>+2 300 clics supplementaires par trimestre</strong>.</p>
+
+<table>
+    <thead><tr><th>Page</th><th>Impressions</th><th>CTR actuel</th><th>CTR cible</th><th>Gain estime</th><th>Effort</th></tr></thead>
+    <tbody>
+        <tr class="highlight"><td>/figatellu-figatelli/</td><td>43 291</td><td>0,72%</td><td>2%</td><td><strong>+550 clics</strong></td><td><span class="effort effort-5">15 min</span></td></tr>
+        <tr><td>/myrte-corse/</td><td>25 024</td><td>1,18%</td><td>2,5%</td><td>+330 clics</td><td><span class="effort effort-5">15 min</span></td></tr>
+        <tr><td>/brocciu-corse-recette/</td><td>24 249</td><td>0,79%</td><td>2%</td><td>+290 clics</td><td><span class="effort effort-5">15 min</span></td></tr>
+        <tr><td>/saute-de-veau/</td><td>21 805</td><td>1,43%</td><td>3%</td><td>+340 clics</td><td><span class="effort effort-5">15 min</span></td></tr>
+        <tr><td>/migliacci/</td><td>18 233</td><td>1,94%</td><td>3%</td><td>+190 clics</td><td><span class="effort effort-5">15 min</span></td></tr>
+        <tr><td>/lonzu-charcuterie/</td><td>15 434</td><td>1,07%</td><td>2,5%</td><td>+220 clics</td><td><span class="effort effort-5">15 min</span></td></tr>
+        <tr><td>/plante-nepita-corse/</td><td>17 678</td><td>2,80%</td><td>4%</td><td>+210 clics</td><td><span class="effort effort-5">15 min</span></td></tr>
+        <tr><td>/terroir-corse/ (titre auto-genere)</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>Positionnement categorie</td><td><span class="effort effort-5">5 min</span></td></tr>
+    </tbody>
+</table>
+
+<h3>Pages fantomes a retirer de Google</h3>
+<p style="font-size:0.82rem;color:var(--muted);margin-bottom:12px;">Ces pages n'apportent rien et diluent la qualite du site aux yeux de Google. Les marquer &laquo;noindex&raquo; dans Rank Math.</p>
+<table>
+    <thead><tr><th>Page</th><th>Probleme</th><th>Effort</th></tr></thead>
+    <tbody>
+        <tr><td>/right-sidebar/, /left-sidebar/</td><td>Pages demo du theme, aucun contenu</td><td><span class="effort effort-5">5 min</span></td></tr>
+        <tr><td>/cart-2/, /newsletter-2/, /checkout-2/</td><td>Doublons WooCommerce</td><td><span class="effort effort-5">5 min</span></td></tr>
+        <tr><td>/404-not-found/</td><td>Fausse page 404 (renvoie un code 200)</td><td><span class="effort effort-5">5 min</span></td></tr>
+        <tr><td>/conditions/, /terms-conditions/</td><td>Doublons de /conditions-generales/</td><td><span class="effort effort-5">5 min</span></td></tr>
+        <tr><td>/cart/ &harr; /checkout/</td><td>Boucle de redirection entre les deux</td><td><span class="effort effort-30">15 min</span></td></tr>
+    </tbody>
+</table>
+
+<h3>Cannibalisation SEO</h3>
+<table>
+    <thead><tr><th>Probleme</th><th>Effet</th><th>Solution</th><th>Effort</th></tr></thead>
+    <tbody>
+        <tr class="highlight"><td>/terroir-corse/ et /epicerie-corse/ ciblent les memes mots-cles</td><td>Google partage les signaux entre les deux au lieu de concentrer sur une seule</td><td>Choisir une arborescence principale et rediriger l'autre</td><td><span class="effort effort-2h">2h</span></td></tr>
+        <tr><td>/boutique-en-ligne-corse/ en erreur 500</td><td>Page avec un bon titre mais inaccessible</td><td>Corriger l'erreur WordPress ou rediriger</td><td><span class="effort effort-2h">1h</span></td></tr>
+    </tbody>
+</table>
+
+<!-- ===== ADS ===== -->
+<h2 id="ads">Google Ads &mdash; Etat du compte <span class="source">Export 26 avr &mdash; 9 mai 2026</span></h2>
+
+<div class="cards" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="card">
+        <div class="card-label">Budget</div>
+        <div class="card-value">12&euro;/j</div>
+        <div class="card-detail">~370&euro;/mois &middot; 1 campagne PMax</div>
+    </div>
+    <div class="card">
+        <div class="card-label">CPC moyen</div>
+        <div class="card-value gold">0,19&euro;</div>
+        <div class="card-detail">Tres bas = diffusion Display, peu de Search</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Conversions</div>
+        <div class="card-value red">3,15</div>
+        <div class="card-detail">sur 14 jours &middot; 100% mobile</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Cout / conversion</div>
+        <div class="card-value red">54,95&euro;</div>
+        <div class="card-detail">Panier moyen ~70&euro;</div>
+    </div>
+</div>
+
+<h3>Constats</h3>
+<table>
+    <thead><tr><th>Constat</th><th>Detail</th></tr></thead>
+    <tbody>
+        <tr class="highlight"><td><strong>1 seule campagne</strong> Performance Max</td><td>Pas de campagne Search manuelle, pas de Shopping dedie, pas de Remarketing</td></tr>
+        <tr><td><strong>CPC 0,19&euro;</strong></td><td>Le PMax diffuse principalement en Display/Discovery (images, YouTube), pas en Search (mots-cles transactionnels)</td></tr>
+        <tr class="highlight"><td><strong>100% des conversions sur mobile</strong></td><td>Desktop + tablette = 43&euro; depenses, 0 conversion</td></tr>
+        <tr><td><strong>Mots-cles parasites</strong></td><td>&laquo;corsica colis&raquo; (concurrent) et &laquo;fitone&raquo; (hors catalogue) dans les themes de recherche</td></tr>
+        <tr><td><strong>1 seul groupe d'assets</strong></td><td>Tout le catalogue melange : coffrets, charcuterie, plateaux, vins</td></tr>
+        <tr class="highlight"><td><strong>Baisse des interactions -63%</strong></td><td>vs periode precedente (12-25 avril)</td></tr>
+    </tbody>
+</table>
+
+<h3>Actions Google Ads</h3>
+<table>
+    <thead><tr><th>#</th><th>Action</th><th>Effort</th><th>Effet attendu</th></tr></thead>
+    <tbody>
+        <tr class="highlight"><td>1</td><td><strong>Exclure les mots-cles parasites</strong> : corsica colis, fitone, recette, gratuit, restaurant, voyage</td><td><span class="effort effort-30">30 min</span></td><td>Arreter de payer pour du trafic hors cible</td></tr>
+        <tr><td>2</td><td><strong>Baisser encheres desktop -50%</strong></td><td><span class="effort effort-5">15 min</span></td><td>~90&euro;/mois reorientes vers mobile</td></tr>
+        <tr class="highlight"><td>3</td><td><strong>Segmenter en 3 groupes d'assets</strong> : Coffrets, Charcuterie, Plateaux</td><td><span class="effort effort-2h">2h</span></td><td>Meilleure pertinence annonces = meilleur retour</td></tr>
+        <tr><td>4</td><td><strong>Creer une campagne Search</strong> sur les requetes transactionnelles</td><td><span class="effort effort-2h">3h</span></td><td>Cibler &laquo;panier garni corse&raquo;, &laquo;coffret cadeau corse&raquo; avec CPC controle</td></tr>
+        <tr><td>5</td><td><strong>Campagne Marque</strong> &laquo;tiramiland&raquo;</td><td><span class="effort effort-30">30 min</span></td><td>Protection de marque, CPC quasi nul</td></tr>
+    </tbody>
+</table>
+
+<!-- ===== SEARCH CONSOLE ===== -->
+<h2 id="search">Search Console &mdash; Trafic organique <span class="source">3 derniers mois</span></h2>
+
+<div class="cards" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="card">
+        <div class="card-label">Clics / jour</div>
+        <div class="card-value green">120</div>
+        <div class="card-detail">10 679 clics sur 3 mois</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Impressions</div>
+        <div class="card-value">540K</div>
+        <div class="card-detail">Le site est vu mais pas assez clique</div>
+    </div>
+    <div class="card">
+        <div class="card-label">CTR moyen</div>
+        <div class="card-value gold">1,98%</div>
+        <div class="card-detail">Ameliorable a 3% avec de meilleurs titles</div>
+    </div>
+    <div class="card">
+        <div class="card-label">Position moyenne</div>
+        <div class="card-value">8,3</div>
+        <div class="card-detail">Bas de page 1</div>
+    </div>
+</div>
+
+<h3>Le blog capte 80% du trafic, les produits 20%</h3>
+<table>
+    <thead><tr><th>#</th><th>Page</th><th>Clics</th><th>Type</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td>/cuisson-du-figatellu/</td><td>945</td><td><span class="badge badge-blue">Blog</span></td></tr>
+        <tr><td>2</td><td>/beignet-de-poireaux-recette-corse/</td><td>572</td><td><span class="badge badge-blue">Blog</span></td></tr>
+        <tr><td>3</td><td>/beignets-corses/</td><td>529</td><td><span class="badge badge-blue">Blog</span></td></tr>
+        <tr><td>4</td><td>/plante-nepita-corse/</td><td>495</td><td><span class="badge badge-blue">Blog</span></td></tr>
+        <tr><td>5</td><td>/migliacci/</td><td>354</td><td><span class="badge badge-blue">Blog</span></td></tr>
+        <tr><td>&hellip;</td><td colspan="3" style="color:var(--muted);">Meilleure page produit : /rhum-corse/ en 12e position (278 clics)</td></tr>
+    </tbody>
+</table>
+<p style="font-size:0.82rem;color:var(--muted);margin-top:8px;">Le blog attire du trafic gratuit de personnes qui cherchent des recettes corses. Si chaque article de recette contient un lien clair vers les produits utilises (figatelli, coppa, myrte&hellip;), ce trafic gratuit se transforme en visites sur la boutique.</p>
+
+<h3>Requetes transactionnelles &mdash; quasi absentes</h3>
+<table>
+    <thead><tr><th>Requete</th><th>Clics</th><th>Position</th></tr></thead>
+    <tbody>
+        <tr><td>panier corse</td><td>10</td><td>5,2</td></tr>
+        <tr><td>epicerie corse</td><td>4</td><td>10,3</td></tr>
+        <tr><td>epicerie corse en ligne</td><td>4</td><td>5,2</td></tr>
+        <tr><td>charcuterie corse en ligne</td><td>3</td><td>8,3</td></tr>
+        <tr><td>panier garni corse</td><td>2</td><td>5,7</td></tr>
+        <tr class="highlight"><td><strong>coffret cadeau corse</strong></td><td><strong>0</strong></td><td><strong>&mdash;</strong></td></tr>
+    </tbody>
+</table>
+<p style="font-size:0.82rem;color:var(--muted);margin-top:8px;"><strong>&laquo;coffret cadeau corse&raquo;</strong> = 1 000 a 2 000 recherches par mois, aucun specialiste corse positionne. Creer une page dediee /coffret-cadeau-corse/ ouvrirait un nouveau canal d'acquisition gratuit.</p>
+
+<!-- ===== CONTENU ===== -->
+<h2 id="contenu">Contenus a creer</h2>
+
+<table>
+    <thead><tr><th>#</th><th>Contenu</th><th>Effort</th><th>Effet attendu</th></tr></thead>
+    <tbody>
+        <tr class="highlight"><td>1</td><td><strong>Page /coffret-cadeau-corse/</strong> &mdash; guide + selection de coffrets</td><td><span class="effort effort-day">6h</span></td><td>1-2K recherches/mois, terrain vide, forte intention d'achat</td></tr>
+        <tr><td>2</td><td><strong>Page /entreprises</strong> &mdash; offre B2B/CSE paniers entreprise</td><td><span class="effort effort-day">8h</span></td><td>1 client CSE = 5 000 a 75 000&euro;, personne ne le fait</td></tr>
+        <tr><td>3</td><td><strong>Liens blog &rarr; produits</strong> dans les 10 articles les plus visites</td><td><span class="effort effort-2h">3h</span></td><td>Transformer le trafic recettes en visites produit</td></tr>
+    </tbody>
+</table>
+
+<!-- ===== STRUCTURE ===== -->
+<h2 id="structure">Structure technique</h2>
+
+<table>
+    <thead><tr><th>#</th><th>Action</th><th>Effort</th><th>Effet</th></tr></thead>
+    <tbody>
+        <tr><td>1</td><td><strong>Schema Product</strong> &mdash; ajouter SKU, marque, note agregee sur les fiches produit</td><td><span class="effort effort-2h">2h</span></td><td>Eligibilite aux resultats enrichis Google (etoiles, prix)</td></tr>
+        <tr><td>2</td><td><strong>Google Merchant Center</strong> &mdash; soumettre le catalogue produit</td><td><span class="effort effort-2h">3h</span></td><td>Fiches marchands : CTR 24% mais seulement 159 impressions actuellement</td></tr>
+        <tr><td>3</td><td><strong>Schema LocalBusiness</strong> &mdash; completer (adresse, telephone)</td><td><span class="effort effort-30">30 min</span></td><td>Visibilite Knowledge Panel Google</td></tr>
+        <tr><td>4</td><td><strong>Categories produit dans le sitemap</strong></td><td><span class="effort effort-5">10 min</span></td><td>Pages categorie indexees</td></tr>
+        <tr><td>5</td><td><strong>Headers securite HSTS</strong></td><td><span class="effort effort-30">30 min</span></td><td>Securite e-commerce + confiance navigateur</td></tr>
+        <tr><td>6</td><td><strong>Precharger l'image hero</strong> (slider Revolution)</td><td><span class="effort effort-2h">2h</span></td><td>Page 1,5 a 3 secondes plus rapide</td></tr>
+        <tr><td>7</td><td><strong>Corriger l'auteur &laquo;BALIZTIC&raquo;</strong> (3 articles + partages reseaux sociaux)</td><td><span class="effort effort-5">10 min</span></td><td>Coherence de marque</td></tr>
+        <tr><td>8</td><td><strong>Limiter les scripts Chronopost</strong> aux pages panier/commande</td><td><span class="effort effort-2h">1h</span></td><td>Pages produit plus rapides</td></tr>
+    </tbody>
+</table>
+
+</div><!-- /container -->
+
+<footer>
+    Sylvain Caron &mdash; Developpement Web et Marketing Analytique<br>
+    Audit realise le 10 mai 2026 &mdash; Donnees : Google Search Console, Google Ads, crawl SEO
+</footer>
+
+</div><!-- /content -->
+
+<script>
+function checkGate(){var e=document.getElementById("gate-pw").value;if(btoa(e)==="Y29yc2U="){document.getElementById("gate").style.display="none";document.getElementById("content").style.display="block";sessionStorage.setItem("gp_auth","1")}else{document.getElementById("gate-error").style.display="block"}}
+if(sessionStorage.getItem("gp_auth")==="1"){document.getElementById("gate").style.display="none";document.getElementById("content").style.display="block"}
+</script>
+
+</body>
+</html>
