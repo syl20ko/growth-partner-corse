@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Facebook — Recettes Corses</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0f0f1a; --card: #1a1a2e; --border: #2a2a4a;
+            --gold: #D4A843; --cream: #F5F0E8; --text: #e8e8f0; --muted: #9898b0;
+            --green: #2ecc71; --blue: #3498db; --orange: #e67e22; --red-l: #b22a2a;
+            --purple: #9b59b6;
+            --r: 12px; --shadow: 0 4px 24px rgba(0,0,0,0.3);
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 800px; margin: 0 auto; padding: 30px 20px 60px; }
+        h1 { font-size: 1.8rem; color: var(--cream); margin-bottom: 4px; }
+        .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 32px; }
+        h2 { font-size: 1.2rem; color: var(--gold); margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+        .back-link { display: inline-block; margin-bottom: 20px; color: var(--gold); text-decoration: none; font-size: 0.85rem; }
+        .back-link:hover { text-decoration: underline; }
+
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0; }
+        .stat { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; text-align: center; }
+        .stat-value { font-size: 1.8rem; font-weight: 700; }
+        .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+        .cal { margin: 20px 0; }
+        .cal-week { margin-bottom: 24px; }
+        .cal-week-title { font-size: 0.78rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 10px; }
+        .cal-post { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.2s; }
+        .cal-post:hover { border-color: var(--gold); }
+        .cal-header { display: flex; align-items: center; gap: 10px; }
+        .cal-day { font-size: 0.82rem; font-weight: 600; color: var(--cream); min-width: 70px; }
+        .cal-type { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; }
+        .type-recette { background: rgba(230,126,34,0.15); color: var(--orange); }
+        .type-produit { background: rgba(46,204,113,0.15); color: var(--green); }
+        .type-promo { background: rgba(178,42,42,0.15); color: var(--red-l); }
+        .type-lifestyle { background: rgba(52,152,219,0.15); color: var(--blue); }
+        .type-event { background: rgba(155,89,182,0.15); color: var(--purple); }
+        .type-avis { background: rgba(212,168,67,0.15); color: var(--gold); }
+        .cal-subject { font-size: 0.88rem; color: var(--cream); flex: 1; }
+        .cal-body { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+        .cal-post.open .cal-body { display: block; }
+        .cal-post.open { border-color: var(--gold); }
+        .post-text { font-size: 0.85rem; color: var(--text); white-space: pre-line; line-height: 1.7; background: rgba(255,255,255,0.03); padding: 14px; border-radius: 8px; }
+        .copy-btn { display: inline-block; margin-top: 10px; padding: 6px 14px; background: var(--gold); color: #111; border: none; border-radius: 6px; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
+        .copy-btn:hover { background: var(--cream); }
+        .copy-btn.copied { background: var(--green); color: #fff; }
+        .photo-hint { font-size: 0.75rem; color: var(--muted); margin-top: 8px; font-style: italic; }
+
+        .templates { margin: 20px 0; }
+        .tpl { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; margin-bottom: 8px; cursor: pointer; }
+        .tpl:hover { border-color: var(--gold); }
+        .tpl-header { display: flex; align-items: center; gap: 10px; }
+        .tpl-name { font-size: 0.9rem; font-weight: 600; color: var(--cream); flex: 1; }
+        .tpl-freq { font-size: 0.72rem; color: var(--muted); }
+        .tpl-body { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 0.82rem; color: var(--muted); white-space: pre-line; }
+        .tpl.open .tpl-body { display: block; }
+
+        .rotation table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .rotation th { text-align: left; padding: 8px 10px; color: var(--gold); font-size: 0.72rem; text-transform: uppercase; border-bottom: 2px solid var(--border); }
+        .rotation td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+
+        footer { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 0.78rem; border-top: 1px solid var(--border); margin-top: 60px; }
+        @media (max-width: 480px) { .stats { grid-template-columns: 1fr; } h1 { font-size: 1.4rem; } .cal-day { min-width: 55px; } }
+    </style>
+</head>
+<body>
+
+<div id="gate" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);">
+    <div style="text-align:center;max-width:400px;padding:40px;">
+        <div style="font-size:48px;margin-bottom:24px;">📱</div>
+        <h2 style="color:var(--gold);margin-bottom:8px;font-size:1.4rem;">Plan Facebook</h2>
+        <p style="color:var(--muted);margin-bottom:24px;font-size:0.9rem;">Acces restreint.</p>
+        <input id="gate-pw" type="password" placeholder="Mot de passe"
+            style="width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:var(--r);background:var(--card);color:var(--text);font-size:1rem;margin-bottom:12px;outline:none;"
+            onkeydown="if(event.key==='Enter')document.getElementById('gate-btn').click()">
+        <button id="gate-btn" onclick="checkGate()"
+            style="width:100%;padding:12px;background:var(--gold);color:#111;border:none;border-radius:var(--r);font-weight:600;font-size:1rem;cursor:pointer;">Acceder</button>
+        <p id="gate-error" style="color:var(--red-l);margin-top:12px;font-size:0.85rem;display:none;">Mot de passe incorrect</p>
+    </div>
+</div>
+
+<div id="content" style="display:none;">
+<div class="container">
+
+<a href="index.html" class="back-link">&larr; Tableau de bord</a>
+<h1>Plan Facebook &mdash; Recettes Corses</h1>
+<p class="subtitle">16 600 fans &middot; 3 posts / semaine &middot; Cliquer sur un post pour voir le texte</p>
+
+<div class="stats">
+    <div class="stat">
+        <div class="stat-value" style="color:var(--green);">16 600</div>
+        <div class="stat-label">Fans Facebook</div>
+    </div>
+    <div class="stat">
+        <div class="stat-value" style="color:var(--gold);">3 / sem</div>
+        <div class="stat-label">Rythme de publication</div>
+    </div>
+    <div class="stat">
+        <div class="stat-value" style="color:var(--cream);">12</div>
+        <div class="stat-label">Posts prets a publier</div>
+    </div>
+</div>
+
+<!-- ===== CALENDRIER ===== -->
+<h2>Publications planifiees</h2>
+<p style="font-size:0.82rem;color:var(--muted);margin-bottom:16px;">Cliquer sur un post pour afficher le texte. Bouton &laquo;Copier&raquo; pour coller directement dans Meta Business Suite.</p>
+
+<div class="cal">
+
+<div class="cal-week">
+<div class="cal-week-title">Semaine du 12 mai</div>
+
+<div class="cal-post" onclick="this.classList.toggle('open')">
+    <div class="cal-header">
+        <span class="cal-day">Lun 12</span>
+        <span class="cal-type type-produit">Produit</span>
+        <span class="cal-subject">Aromates du maquis — saison grillades</span>
+    </div>
+    <div class="cal-body">
+        <div class="post-text" id="post1">🌿 Les beaux jours arrivent... et les grillades aussi !
+
+Nos aromates du maquis corse vont transformer votre barbecue. Thym, romarin, sarriette, myrte : cueillis en Corse, seches naturellement, prets a parfumer vos viandes et poissons grilles.
+
+Un tour de moulin sur vos braises et c'est toute la Corse qui s'invite a votre table.
+
+Disponible sur recettes-corses.fr :
+→ https://www.recettes-corses.fr/produit/aromates-corses/
+
+Livraison offerte des 100€ !
+
+#AromatesCorse #Barbecue #Grillades #Maquis #Corse #EteCorse</div>
+        <button class="copy-btn" onclick="event.stopPropagation();copyPost(this,'post1')">Copier le texte</button>
+        <div class="photo-hint">Photo suggeree : aromates en pot ou sur une planche avec des grillades</div>
+    </div>
+</div>
+
+<div class="cal-post" onclick="this.classList.toggle('open')">
+    <div class="cal-header">
+        <span class="cal-day">Mer 14</span>
+        <span class="cal-type type-recette">Recette</span>
+        <span class="cal-subject">Pizza au figatelli et brocciu</span>
+    </div>
+    <div class="cal-body">
+        <div class="post-text" id="post2">🍕 Pizza au figatelli et brocciu — pour 4 personnes
+
+Une pizza corse comme la-bas : pate fine, figatelli tranche, brocciu frais, un filet d'huile d'olive corse. Simple, authentique, inoubliable.
+
+La recette complete avec tous les details de preparation :
+→ https://www.recettes-corses.fr/pizza-figatelli/
+
+Retrouvez le figatelli et le brocciu sur notre boutique !
+
+#PizzaCorse #Figatelli #Brocciu #RecettesCorse #CuisineCorse</div>
+        <button class="copy-btn" onclick="event.stopPropagation();copyPost(this,'post2')">Copier le texte</button>
+        <div class="photo-hint">Photo suggeree : pizza corse sortie du four, vue du dessus</div>
+    </div>
+</div>
+
+<div class="cal-post" onclick="this.classList.toggle('open')">
+    <div class="cal-header">
+        <span class="cal-day">Ven 16</span>
+        <span class="cal-type type-lifestyle">Lifestyle</span>
+        <span class="cal-subject">Le maquis corse en mai</span>
+    </div>
+    <div class="cal-body">
+        <div class="post-text" id="post3">🏔️ Le maquis corse en mai...
+
+Les senteurs explosent : immortelle, myrte, romarin sauvage. C'est la saison ou le maquis est le plus parfume. Chaque produit que nous vous envoyons porte un peu de ces collines.
+
+Et vous, quel est votre souvenir de Corse prefere ? Dites-le nous en commentaire 👇
+
+#Corse #Maquis #Terroir #Immortelle #NatureCorse</div>
+        <button class="copy-btn" onclick="event.stopPropagation();copyPost(this,'post3')">Copier le texte</button>
+        <div class="photo-hint">Photo suggeree : paysage maquis corse, collines fleuries</div>
+    </div>
+</div>
+</div>
+
+<div class="cal-week">
+<div class="cal-week-title">Semaine du 19 mai</div>
+
+<div class="cal-post" onclick="this.classList.toggle('open')">
+    <div class="cal-header">
+        <span class="cal-day">Lun 19</span>
+        <span class="cal-type type-recette">Recette</span>
+        <span class="cal-subject">Beignets a la farine de chataigne</span>
+    </div>
+    <div class="cal-body">
+        <div class="post-text" id="post4">🥮 Beignets a la farine de chataigne — pour 6 personnes
+
+Croustillants dehors, moelleux dedans. La farine de chataigne corse AOP donne a ces beignets un gout de noisette inimitable. Une recette simple que toute la famille va adorer.
+
+La recette complete :
+→ https://www.recettes-corses.fr/beignets-corses/
+
+Notre farine de chataigne corse AOP :
+→ https://www.recettes-corses.fr/produit/farine-de-chataigne/
+
+#BeignetsCorse #FarineDeChataigne #AOP #RecettesCorse #Gouter</div>
+        <button class="copy-btn" onclick="event.stopPropagation();copyPost(this,'post4')">Copier le texte</button>
+        <div class="photo-hint">Photo suggeree : beignets dores sur une assiette, farine en arriere-plan</div>
+    </div>
+</div>
+
+<div class="cal-post" onclick="this.classList.toggle('open')">
+    <div class="cal-header">
+        <span class="cal-day">Mer 21</span>
+        <span class="cal-type type-event">Evenement</span>
+        <span class="cal-subject">Fete des Meres — idees cadeaux</span>
+    </div>
+    <div class="cal-body">
+        <div class="post-text" id="post5">💐 Fete des Meres — c'est bientot !
+
+Et si vous lui offriez un voyage gustatif en Corse ? Confitures artisanales de clementines, miel du maquis, huile d'olive AOP, aromates...
+
+Un panier gourmand qui change des fleurs et qui se deguste pendant des semaines.
+
+Decouvrez nos idees cadeaux :
+→ https://www.recettes-corses.fr/boutique/
+
+Commandez avant le 25 mai pour une livraison a temps !
+
+#FeteDesMeres #CadeauGourmand #Corse #IdeesCadeaux #PanierCorse</div>
+        <button class="copy-btn" onclick="event.stopPropagation();copyPost(this,'post5')">Copier le texte</button>
+        <div class="photo-hint">Photo suggeree : panier garni avec ruban, ambiance cadeau</div>
+    </div>
+</div>
+
+<div class="cal-post" onclick="this.classList.toggle('open')">
+    <div class="cal-header">
+        <span class="cal-day">Ven 23</span>
+        <span class="cal-type type-produit">Produit</span>
+        <span class="cal-subject">Confiture clementines Guidici</span>
+    </div>
+    <div class="cal-body">
+        <div class="post-text" id="post6">🍊 La confiture de clementines corses Guidici
+
+Fabriquee artisanalement en Corse avec des clementines de la plaine orientale. Pas de colorant, pas de conservateur. Juste le fruit, le sucre, et le savoir-faire.
+
+Sur vos tartines du matin, dans un yaourt, ou en garniture d'un gateau : elle fait l'unanimite.
+
+→ https://www.recettes-corses.fr/produit/confiture-clementines-guidici/
+
+#ConfituresCorse #Clementine #Guidici #ArtisanalCorse #PetitDejeuner</div>
+        <button class="copy-btn" onclick="event.stopPropagation();copyPost(this,'post6')">Copier le texte</button>
+        <div class="photo-hint">Photo suggeree : pot de confiture ouvert, tartine, clementines</div>
+    </div>
+</div>
+</div>
+
+<div class="cal-week">
+<div class="cal-week-title">Semaine du 26 mai</div>
+
+<div class="cal-post" onclick="this.classList.toggle('open')">
+    <div class="cal-header">
+        <span class="cal-day">Lun 26</span>
+        <span class="cal-type type-recette">Recette</span>
+        <span class="cal-subject">Pates au brocciu</span>
+    </div>
+    <div class="cal-body">
+        <div class="post-text" id="post7">🍝 Pates au brocciu — pour 4 personnes
+
+Le brocciu frais fond dans les pates chaudes et cree une sauce onctueuse naturelle. Ajoutez un peu de menthe fraiche (nepita) et du poivre du moulin. 15 minutes de preparation, un resultat bluffant.
+
+La recette complete :
+→ https://www.recettes-corses.fr/pates-au-brocciu-recette-corse/
+
+#PatesBrocciu #Brocciu #RecettesCorse #CuisineRapide #Corse</div>
+        <button class="copy-btn" onclick="event.stopPropagation();copyPost(this,'post7')">Copier le texte</button>
+        <div class="photo-hint">Photo suggeree : assiette de pates cremeuses, brocciu visible</div>
+    </div>
+</div>
+
+<div class="cal-post" onclick="this.classList.toggle('open')">
+    <div class="cal-header">
+        <span class="cal-day">Mer 28</span>
+        <span class="cal-type type-promo">Promo</span>
+        <span class="cal-subject">Livraison offerte des 100€</span>
+    </div>
+    <div class="cal-body">
+        <div class="post-text" id="post8">🎁 Livraison offerte des 100€ !
+
+Bonne nouvelle : la livraison en point relais est offerte des 100€ de commande. Chronopost livre en 2 a 4 jours partout en France.
+
+C'est le moment de faire le plein de produits corses pour l'ete !
+
+→ https://www.recettes-corses.fr/boutique/
+
+#LivraisonGratuite #ProduitsCorse #Chronopost #BonPlan</div>
+        <button class="copy-btn" onclick="event.stopPropagation();copyPost(this,'post8')">Copier le texte</button>
+        <div class="photo-hint">Photo suggeree : colis ouvert avec des produits corses, ambiance deballage</div>
+    </div>
+</div>
+
+<div class="cal-post" onclick="this.classList.toggle('open')">
+    <div class="cal-header">
+        <span class="cal-day">Ven 30</span>
+        <span class="cal-type type-event">Evenement</span>
+        <span class="cal-subject">Fete des Meres — dernier rappel</span>
+    </div>
+    <div class="cal-body">
+        <div class="post-text" id="post9">💝 Fete des Meres dimanche !
+
+Il est encore temps de commander un panier gourmand corse pour votre maman. Confitures, miel, huile d'olive, aromates du maquis... un cadeau qui a du gout.
+
+Commande express, livraison Chronopost 24h :
+→ https://www.recettes-corses.fr/boutique/
+
+#FeteDesMeres #DernierJour #CadeauCorse #Maman</div>
+        <button class="copy-btn" onclick="event.stopPropagation();copyPost(this,'post9')">Copier le texte</button>
+        <div class="photo-hint">Photo suggeree : coffret cadeau emballe, fleurs en arriere-plan</div>
+    </div>
+</div>
+</div>
+
+<div class="cal-week">
+<div class="cal-week-title">Semaine du 2 juin</div>
+
+<div class="cal-post" onclick="this.classList.toggle('open')">
+    <div class="cal-header">
+        <span class="cal-day">Lun 2</span>
+        <span class="cal-type type-lifestyle">Lifestyle</span>
+        <span class="cal-subject">Chez Rospigliani — producteur</span>
+    </div>
+    <div class="cal-body">
+        <div class="post-text" id="post10">🐷 Chez Rospigliani, en Haute-Corse
+
+Nos charcuteries viennent de producteurs que nous connaissons personnellement. La famille Rospigliani eleve ses porcs en semi-liberte dans le maquis. Coppa, lonzu, figatelli : tout est fait a la main, comme avant.
+
+Quand vous commandez chez nous, vous savez d'ou ca vient.
+
+→ https://www.recettes-corses.fr/boutique/
+
+#Producteur #CharcuterieCorse #Rospigliani #CircuitCourt #Terroir</div>
+        <button class="copy-btn" onclick="event.stopPropagation();copyPost(this,'post10')">Copier le texte</button>
+        <div class="photo-hint">Photo suggeree : producteur au travail, cochons en liberte, sechoir a charcuterie</div>
+    </div>
+</div>
+
+<div class="cal-post" onclick="this.classList.toggle('open')">
+    <div class="cal-header">
+        <span class="cal-day">Mer 4</span>
+        <span class="cal-type type-recette">Recette</span>
+        <span class="cal-subject">Comment cuire le figatellu (3 facons)</span>
+    </div>
+    <div class="cal-body">
+        <div class="post-text" id="post11">🔥 Comment cuire le figatellu ? 3 facons !
+
+1. A la poele : 5-7 min a feu moyen, piquer la peau
+2. Au barbecue : 4-5 min par face, braises douces
+3. Au four : 15 min a 200°C
+
+Le secret : ne pas le cuire trop fort pour garder le moelleux.
+
+Le guide complet :
+→ https://www.recettes-corses.fr/cuisson-du-figatellu/
+
+#Figatellu #CuissonFigatellu #Barbecue #RecettesCorse #Corse</div>
+        <button class="copy-btn" onclick="event.stopPropagation();copyPost(this,'post11')">Copier le texte</button>
+        <div class="photo-hint">Photo suggeree : figatellu sur le gril ou dans une poele</div>
+    </div>
+</div>
+
+<div class="cal-post" onclick="this.classList.toggle('open')">
+    <div class="cal-header">
+        <span class="cal-day">Ven 6</span>
+        <span class="cal-type type-event">Evenement</span>
+        <span class="cal-subject">Fete des Peres — teasing</span>
+    </div>
+    <div class="cal-body">
+        <div class="post-text" id="post12">🎣 Fete des Peres — le 15 juin !
+
+Le cadeau parfait pour un papa gourmand ? Un plateau aperitif corse : saucisson, coppa, lonzu, fromage de brebis, et un bon vin corse.
+
+Mieux qu'une cravate. Garanti.
+
+Decouvrez nos selections :
+→ https://www.recettes-corses.fr/boutique/
+
+Commandez avant le 10 juin pour etre livre a temps !
+
+#FeteDesPeres #AperitifCorse #CadeauPapa #Charcuterie #Corse</div>
+        <button class="copy-btn" onclick="event.stopPropagation();copyPost(this,'post12')">Copier le texte</button>
+        <div class="photo-hint">Photo suggeree : plateau aperitif dresse, ambiance masculine/conviviale</div>
+    </div>
+</div>
+</div>
+
+</div><!-- /cal -->
+
+<!-- ===== TEMPLATES ===== -->
+<h2>Templates reutilisables</h2>
+<p style="font-size:0.82rem;color:var(--muted);margin-bottom:16px;">6 formats a alterner. Cliquer pour voir le modele.</p>
+
+<div class="templates">
+<div class="tpl" onclick="this.classList.toggle('open')">
+    <div class="tpl-header">
+        <span class="cal-type type-recette">Recette</span>
+        <span class="tpl-name">Recette corse + lien produit</span>
+        <span class="tpl-freq">1x / semaine</span>
+    </div>
+    <div class="tpl-body">[EMOJI] [NOM DE LA RECETTE] — pour [X] personnes
+
+[2-3 lignes de description appetissante]
+
+La recette complete :
+→ [LIEN ARTICLE RECETTES-CORSES.FR]
+
+Retrouvez les ingredients sur notre boutique :
+→ [LIEN PRODUIT]
+
+#RecettesCorse #CuisineCorse #[MotCle] #Corse</div>
+</div>
+
+<div class="tpl" onclick="this.classList.toggle('open')">
+    <div class="tpl-header">
+        <span class="cal-type type-produit">Produit star</span>
+        <span class="tpl-name">Mise en avant d'un produit</span>
+        <span class="tpl-freq">1x / semaine</span>
+    </div>
+    <div class="tpl-body">[EMOJI] [NOM DU PRODUIT]
+
+[2-3 lignes : origine, producteur, saison, ce qui le rend special]
+
+[1 ligne sur comment le deguster / le cuisiner]
+
+Disponible sur recettes-corses.fr :
+→ [LIEN PRODUIT]
+
+Livraison offerte des 100€ !
+
+#ProduitsCorse #[NomProduit] #EpicerieFine #Corse</div>
+</div>
+
+<div class="tpl" onclick="this.classList.toggle('open')">
+    <div class="tpl-header">
+        <span class="cal-type type-promo">Promo / Offre</span>
+        <span class="tpl-name">Promotion ou offre speciale</span>
+        <span class="tpl-freq">1-2x / mois</span>
+    </div>
+    <div class="tpl-body">[EMOJI] [TITRE DE L'OFFRE]
+
+[1-2 lignes claires sur l'offre]
+
+[Conditions : date limite, seuil, code]
+
+→ [LIEN BOUTIQUE]
+
+#PromosCorse #BonPlan #EpicerieCorse</div>
+</div>
+
+<div class="tpl" onclick="this.classList.toggle('open')">
+    <div class="tpl-header">
+        <span class="cal-type type-lifestyle">Lifestyle / Terroir</span>
+        <span class="tpl-name">Photo Corse + storytelling</span>
+        <span class="tpl-freq">1-2x / mois</span>
+    </div>
+    <div class="tpl-body">[EMOJI] [TITRE EVOCATEUR]
+
+[3-4 lignes de storytelling : la Corse, le terroir, une anecdote, une saison]
+
+[Question ouverte pour les commentaires]
+
+#Corse #Terroir #Maquis #IleDeBeau</div>
+</div>
+
+<div class="tpl" onclick="this.classList.toggle('open')">
+    <div class="tpl-header">
+        <span class="cal-type type-event">Evenement</span>
+        <span class="tpl-name">Temps fort / saison</span>
+        <span class="tpl-freq">Avant chaque evenement</span>
+    </div>
+    <div class="tpl-body">[EMOJI] [NOM DE L'EVENEMENT] — c'est bientot !
+
+[2-3 lignes : idee cadeau ou produit de saison]
+
+[Suggestion de coffret ou panier]
+
+Commandez avant le [DATE] pour etre livre a temps !
+→ [LIEN PRODUIT]
+
+#[Evenement] #CadeauCorse #Corse</div>
+</div>
+
+<div class="tpl" onclick="this.classList.toggle('open')">
+    <div class="tpl-header">
+        <span class="cal-type type-avis">Avis client</span>
+        <span class="tpl-name">Temoignage + remerciement</span>
+        <span class="tpl-freq">1-2x / mois</span>
+    </div>
+    <div class="tpl-body">[EMOJI ETOILE] Merci [PRENOM] !
+
+"[CITATION AVIS CLIENT]"
+
+Ca fait chaud au coeur. Merci pour votre confiance.
+
+Vous aussi, decouvrez nos produits corses :
+→ [LIEN BOUTIQUE]
+
+#AvisClients #RecettesCorse #Confiance</div>
+</div>
+</div>
+
+<!-- ===== ROTATION ===== -->
+<h2>Rotation mensuelle</h2>
+<div class="rotation">
+<table>
+    <thead><tr><th>Semaine</th><th>Lundi</th><th>Mercredi</th><th>Vendredi</th></tr></thead>
+    <tbody>
+        <tr><td>S1</td><td><span class="cal-type type-produit">Produit</span></td><td><span class="cal-type type-recette">Recette</span></td><td><span class="cal-type type-lifestyle">Lifestyle</span></td></tr>
+        <tr><td>S2</td><td><span class="cal-type type-recette">Recette</span></td><td><span class="cal-type type-event">Evenement</span></td><td><span class="cal-type type-produit">Produit</span></td></tr>
+        <tr><td>S3</td><td><span class="cal-type type-lifestyle">Lifestyle</span></td><td><span class="cal-type type-recette">Recette</span></td><td><span class="cal-type type-promo">Promo</span></td></tr>
+        <tr><td>S4</td><td><span class="cal-type type-recette">Recette</span></td><td><span class="cal-type type-produit">Produit</span></td><td><span class="cal-type type-avis">Avis</span></td></tr>
+    </tbody>
+</table>
+</div>
+
+</div>
+<footer>Sylvain Caron &mdash; Developpement Web et Marketing Analytique</footer>
+</div>
+
+<script>
+const HASH='dd5655c6cad88c258c64eea3964397b432cf2f0f582c08a9020dc57e411a77c7';
+async function sha256(m){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(m));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function checkGate(){if(await sha256(document.getElementById('gate-pw').value)===HASH){document.getElementById('gate').style.display='none';document.getElementById('content').style.display='block';sessionStorage.setItem('gpc','1')}else{document.getElementById('gate-error').style.display='block';document.getElementById('gate-pw').value=''}}
+if(sessionStorage.getItem('gpc')==='1'){document.getElementById('gate').style.display='none';document.getElementById('content').style.display='block'}
+function copyPost(btn,id){var t=document.getElementById(id).innerText;navigator.clipboard.writeText(t).then(function(){btn.textContent='Copie !';btn.classList.add('copied');setTimeout(function(){btn.textContent='Copier le texte';btn.classList.remove('copied')},2000)})}
+</script>
+</body>
+</html>
